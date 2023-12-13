@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { add } from "../cart/cartSlice";
-import Skeleton from "react-loading-skeleton"
-import { dataProducts } from "../filter/filterSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping, faStar } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios"
@@ -23,7 +21,6 @@ const ProductList = () => {
       .get("/products")
       .then((response) => {
         const {data} = response
-        dispatch(dataProducts(data))
         setProduct(data)
       })
       .catch((err) => {
@@ -89,13 +86,13 @@ const ProductList = () => {
 
   return (
     <>
-        {isLoading ? (<Skeleton height={1000} count={5} />) : (
+        {isLoading ? ("loading...") : (
             <div className="flex flex-col">
               <div className="flex-1">
               <div className="w-full lg:h-[7rem] xl:h-[7rem] h-14rem grid grid-rows-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
           <div className="flex-1 flex flex-col gap-2">
-          <label className="font-semibold ">Sorting Products</label>
-          <select onClick={(e) => setSort(e.target.value)} className="p-2 bg-slate-200 rounded-lg text-md">
+          <label htmlFor="sort" className="font-semibold">Sorting Products</label>
+          <select onClick={(e) => setSort(e.target.value)} className="p-2 bg-slate-200 rounded-lg text-md" aria-label="sort-product">
                   <option value="Select Filter">Sort Product</option>
                   <option value="asc">Ascending (A - Z)</option>
                   <option value="desc">Descending (Z - A)</option>
@@ -104,8 +101,8 @@ const ProductList = () => {
               </select>
           </div>
           <div className="flex-1 flex flex-col gap-2">
-          <label className="font-semibold ">Select by Categories</label>
-              <select onClick={(e) => setCategory(e.target.value)} className="p-2 bg-slate-200 rounded-lg text-md">
+          <label className="font-semibold" htmlFor="select-categories">Select by Categories</label>
+              <select onClick={(e) => setCategory(e.target.value)} className="p-2 bg-slate-200 rounded-lg text-md" aria-label="select-categories">
                   <option value="All Categories">Filter Categories</option>
                   <option value="men's clothing" >Mens Clothing</option>
                   <option value="women's clothing">Womens Clothing</option>
@@ -128,14 +125,12 @@ const ProductList = () => {
       </div>
               </div>
               <div className="flex-1">
-            <div className="w-full h-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4" style={{
-              boxShadow : "rgba(149, 157, 165, 0.2) 0px 8px 24px"
-            }}>
+            <div className="w-full h-full max-w-7xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 py-4">
             {filteredData.map((product) => {
             return (
               <div
                 key={product.id}
-                className="group bg-white rounded-xl border shadow p-6 gap-4 flex flex-col"
+                className="group bg-white rounded-xl border shadow-xl p-6 gap-4 flex flex-col"
               >
                 <div className="relative w-[80%] h-[350px] mx-auto overflow-hidden">
                 <h1 className="text-center text-lg font-semibold">{product.title}</h1>
@@ -144,6 +139,7 @@ const ProductList = () => {
                     src={product.image}
                     alt={product.title}
                     className="w-full h-full object-contain group-hover:scale-110 transition-all duration-500 ease-in-out"
+                    rel="preload"
                   />
                   </div>
                 </div>
@@ -154,7 +150,7 @@ const ProductList = () => {
                   <FontAwesomeIcon icon={faCartShopping} />{" "} Add To Cart
                 </button>
                 <span className="flex w-full mx-auto flex-row justify-between"><p className="text-black font-bold text-xl px-4 py-3">${product.price} | {product.category}</p> <p className="py-3 text-black gap-3 font-semibold text-lg"><FontAwesomeIcon icon={faStar} className="text-black"/> {""} {product.rating.rate}</p></span>
-                
+           
               </div>
             )
           })}
