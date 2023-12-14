@@ -5,7 +5,12 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "cardLogin" : "#D8DAE6",
+        "cardColor" : "#FBFDFC"
+      }
+    },
   },
   plugins: [],
 }

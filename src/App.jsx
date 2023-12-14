@@ -1,32 +1,43 @@
-import { useState } from 'react'
-import './App.css'
-import Header from './components/Header'
-import ProductList from './features/productlist/ProductList'
-import CartModal from './features/cart/CartModal'
-import Footer from './components/Footer'
-import Slideshow from './components/SlideShow'
+import { useCookies } from "react-cookie";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import Login from "./features/authentication/Login";
+import Homepage from "./Homepage";
+import Register from "./features/authentication/Register";
+import { userLogin, login, logout } from "./features/user/userSlice";
+import { auth } from "./features/configuration/firebase";
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
 
 function App() {
-  const [isOpenModalCart, setIsOpenModalCart] = useState(false)
+  const [cookie, , ] = useCookies(["token", "role"]);
+  const user = useSelector(userLogin);
+  const dispatch = useDispatch();
 
-  const handleOpenModalCart = () => {
-    setIsOpenModalCart(true)
-  }
+  useEffect(() => {
+    onAuthStateChanged(auth, (userAuth) => {
+      if (userAuth) {
+        dispatch(
+          login({
+            email: userAuth.email,
+            uid: userAuth.uid,
+          })
+        );
+      } else {
+        dispatch(logout());
+      }
+    });
+  }, []);
 
-  const handleHideModalCart = () => {
-    setIsOpenModalCart(false)
-  }
   return (
-    <>
-      {isOpenModalCart ? <CartModal handleHideModalCart={handleHideModalCart}/> : null}
-      <Header handleOpenModalCart={handleOpenModalCart}/>
-      <Slideshow />
-      <main className='max-w-7xl mx-auto px-4'> 
-        <ProductList />
-      </main>
-        <Footer />
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/" element={<Homepage />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
